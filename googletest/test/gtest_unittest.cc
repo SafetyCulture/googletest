@@ -26,8 +26,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Author: wan@google.com (Zhanyong Wan)
+
 //
 // Tests for Google Test itself.  This verifies that the basic constructs of
 // Google Test work.
@@ -64,9 +63,7 @@ TEST(CommandLineFlagsTest, CanBeAccessedInCodeOnceGTestHIsIncluded) {
 #include <map>
 #include <vector>
 #include <ostream>
-#if GTEST_LANG_CXX11
 #include <unordered_set>
-#endif  // GTEST_LANG_CXX11
 
 #include "gtest/gtest-spi.h"
 #include "src/gtest-internal-inl.h"
@@ -444,10 +441,10 @@ class FormatEpochTimeInMillisAsIso8601Test : public Test {
   virtual void SetUp() {
     saved_tz_ = NULL;
 
-    GTEST_DISABLE_MSC_WARNINGS_PUSH_(4996 /* getenv, strdup: deprecated */)
+    GTEST_DISABLE_MSC_DEPRECATED_PUSH_(/* getenv, strdup: deprecated */)
     if (getenv("TZ"))
       saved_tz_ = strdup(getenv("TZ"));
-    GTEST_DISABLE_MSC_WARNINGS_POP_()
+    GTEST_DISABLE_MSC_DEPRECATED_POP_()
 
     // Set up the time zone for FormatEpochTimeInMillisAsIso8601 to use.  We
     // cannot use the local time zone because the function's output depends
@@ -1385,8 +1382,7 @@ class TestResultTest : public Test {
     // In order to test TestResult, we need to modify its internal
     // state, in particular the TestPartResult vector it holds.
     // test_part_results() returns a const reference to this vector.
-    // We cast it to a non-const object s.t. it can be modified (yes,
-    // this is a hack).
+    // We cast it to a non-const object s.t. it can be modified
     TPRVector* results1 = const_cast<TPRVector*>(
         &TestResultAccessor::test_part_results(*r1));
     TPRVector* results2 = const_cast<TPRVector*>(
@@ -2092,8 +2088,8 @@ TEST_F(UnitTestRecordPropertyTest,
        AddRecordWithReservedKeysGeneratesCorrectPropertyList) {
   EXPECT_NONFATAL_FAILURE(
       Test::RecordProperty("name", "1"),
-      "'classname', 'name', 'status', 'time', 'type_param', and 'value_param'"
-      " are reserved");
+      "'classname', 'name', 'status', 'time', 'type_param', 'value_param',"
+      " 'file', and 'line' are reserved");
 }
 
 class UnitTestRecordPropertyTestEnvironment : public Environment {
@@ -2119,7 +2115,7 @@ class UnitTestRecordPropertyTestEnvironment : public Environment {
 };
 
 // This will test property recording outside of any test or test case.
-static Environment* record_property_env =
+static Environment* record_property_env GTEST_ATTRIBUTE_UNUSED_ =
     AddGlobalTestEnvironment(new UnitTestRecordPropertyTestEnvironment);
 
 // This group of tests is for predicate assertions (ASSERT_PRED*, etc)
@@ -5158,8 +5154,7 @@ TEST(AssertionResultTest, CanStreamOstreamManipulators) {
   EXPECT_STREQ("Data\n\\0Will be visible", r.message());
 }
 
-// The next test uses explicit conversion operators -- a C++11 feature.
-#if GTEST_LANG_CXX11
+// The next test uses explicit conversion operators
 
 TEST(AssertionResultTest, ConstructibleFromContextuallyConvertibleToBool) {
   struct ExplicitlyConvertibleToBool {
@@ -5171,8 +5166,6 @@ TEST(AssertionResultTest, ConstructibleFromContextuallyConvertibleToBool) {
   EXPECT_FALSE(v1);
   EXPECT_TRUE(v2);
 }
-
-#endif  // GTEST_LANG_CXX11
 
 struct ConvertibleToAssertionResult {
   operator AssertionResult() const { return AssertionResult(true); }
@@ -7373,7 +7366,7 @@ GTEST_TEST(AlternativeNameTest, Works) {  // GTEST_TEST is the same as TEST.
 
 // Tests for internal utilities necessary for implementation of the universal
 // printing.
-// TODO(vladl@google.com): Find a better home for them.
+// FIXME: Find a better home for them.
 
 class ConversionHelperBase {};
 class ConversionHelperDerived : public ConversionHelperBase {};
@@ -7557,7 +7550,6 @@ TEST(IsContainerTestTest, WorksForContainer) {
             sizeof(IsContainerTest<std::map<int, double> >(0)));
 }
 
-#if GTEST_LANG_CXX11
 struct ConstOnlyContainerWithPointerIterator {
   using const_iterator = int*;
   const_iterator begin() const;
@@ -7579,7 +7571,6 @@ TEST(IsContainerTestTest, ConstOnlyContainer) {
   EXPECT_EQ(sizeof(IsContainer),
             sizeof(IsContainerTest<ConstOnlyContainerWithClassIterator>(0)));
 }
-#endif  // GTEST_LANG_CXX11
 
 // Tests IsHashTable.
 struct AHashTable {
@@ -7592,10 +7583,8 @@ struct NotReallyAHashTable {
 TEST(IsHashTable, Basic) {
   EXPECT_TRUE(testing::internal::IsHashTable<AHashTable>::value);
   EXPECT_FALSE(testing::internal::IsHashTable<NotReallyAHashTable>::value);
-#if GTEST_LANG_CXX11
   EXPECT_FALSE(testing::internal::IsHashTable<std::vector<int>>::value);
   EXPECT_TRUE(testing::internal::IsHashTable<std::unordered_set<int>>::value);
-#endif  // GTEST_LANG_CXX11
 #if GTEST_HAS_HASH_SET_
   EXPECT_TRUE(testing::internal::IsHashTable<__gnu_cxx::hash_set<int>>::value);
 #endif  // GTEST_HAS_HASH_SET_

@@ -131,7 +131,7 @@ In August 2008 we had to switch the default death test style from `fast` to
 default. This caused many death tests to slow down. Unfortunately this change
 was necessary.
 
-Please read [Fixing Failing Death Tests](death_test_styles.md) for what you can
+Please read [Fixing Failing Death Tests](advanced.md#death-test-styles) for what you can
 do.
 
 ## I got some run-time errors about invalid proto descriptors when using `ProtocolMessageEquals`. Help!
@@ -707,8 +707,9 @@ In general, the recommended way to cause the code to behave differently under
 test is [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection). You can inject
 different functionality from the test and from the production code. Since your
 production code doesn't link in the for-test logic at all (the
-[`testonly`](http://go/testonly) attribute for BUILD targets helps to ensure
-that), there is no danger in accidentally running it.
+[`testonly`](https://docs.bazel.build/versions/master/be/common-definitions.html#common.testonly)
+attribute for BUILD targets helps to ensure that), there is no danger in
+accidentally running it.
 
 However, if you *really*, *really*, *really* have no choice, and if you follow
 the rule of ending your test program names with `_test`, you can use the
